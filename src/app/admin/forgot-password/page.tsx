@@ -10,7 +10,6 @@ import { Pill, Shield, ArrowLeft, Mail } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/client";
 import { siteConfig } from "@/config/site";
 import { getAuthErrorMessage, getSiteUrl } from "@/lib/utils";
 
@@ -26,7 +25,6 @@ function AdminForgotPasswordForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
   const form = useForm<ForgotInput>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: ForgotInput) => {
@@ -34,18 +32,24 @@ function AdminForgotPasswordForm() {
     setError("");
     setSuccess(false);
 
-    const siteUrl = getSiteUrl();
-    const redirectTo = `${siteUrl}/auth/verify?next=/auth/reset-password&redirect=${encodeURIComponent("/admin/login")}`;
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, redirect: "/admin/login" }),
+      });
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo,
-    });
+      const result = (await res.json()) as { error?: string; success?: boolean };
 
-    if (resetError) {
-      setError(resetError.message);
-    } else {
-      setSuccess(true);
+      if (!res.ok) {
+        setError(result.error ?? "Could not send reset link. Try again.");
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setError("Network error. Check your connection and try again.");
     }
+
     setLoading(false);
   };
 
