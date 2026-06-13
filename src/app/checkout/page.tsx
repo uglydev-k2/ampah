@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { checkoutSchema, type CheckoutInput } from "@/lib/validations/schemas";
 import { formatPrice, generateOrderNumber } from "@/lib/utils";
 import { useCartStore } from "@/stores/cart-store";
+import { FREE_SHIPPING_THRESHOLD_GHS, SHIPPING_FEE_GHS } from "@/data/ghana-prices";
 
 export default function CheckoutPage() {
   const { items, getSubtotal, clearCart } = useCartStore();
@@ -19,7 +20,7 @@ export default function CheckoutPage() {
 
   const subtotal = getSubtotal();
   const discount = couponApplied ? subtotal * 0.1 : 0;
-  const shipping = subtotal >= 35 ? 0 : 5.99;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD_GHS ? 0 : SHIPPING_FEE_GHS;
   const tax = (subtotal - discount) * 0.08;
   const total = subtotal - discount + shipping + tax;
 

@@ -1,112 +1,183 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
-  LayoutDashboard, Package, FolderOpen, Warehouse, ShoppingCart,
-  Users, FileText, Bell, BarChart3,
+  DollarSign,
+  ShoppingCart,
+  Users,
+  Package,
+  TrendingUp,
+  Percent,
+  ArrowRight,
+  AlertTriangle,
 } from "lucide-react";
+import { StatCard } from "@/components/admin/stat-card";
+import { DashboardHero } from "@/components/admin/dashboard-hero";
+import { OrderKanban } from "@/components/admin/order-kanban";
+import { LiveActivityFeed } from "@/components/admin/live-activity-feed";
+import { RxQueuePanel } from "@/components/admin/rx-queue-panel";
+import { PerformanceRings } from "@/components/admin/performance-rings";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from "recharts";
-import { Badge } from "@/components/ui/badge";
+  RevenueOrdersChart,
+  CategoryPieChart,
+  HourlyTrafficChart,
+} from "@/components/admin/dashboard-charts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils";
-import { adminStats, sampleProducts } from "@/data/sample-data";
-import { siteConfig } from "@/config/site";
+import { useAdminStore } from "@/stores/admin-store";
+import { dashboardKpis, topProducts, lowStockProducts } from "@/data/admin-data";
 
-const sidebarLinks = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/categories", label: "Categories", icon: FolderOpen },
-  { href: "/admin/inventory", label: "Inventory", icon: Warehouse },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/admin/customers", label: "Customers", icon: Users },
-  { href: "/admin/prescriptions", label: "Prescriptions", icon: FileText },
-  { href: "/admin/notifications", label: "Notifications", icon: Bell },
-];
+const statusVariant: Record<string, "success" | "warning" | "info" | "danger" | "default"> = {
+  pending: "warning",
+  confirmed: "info",
+  processing: "info",
+  shipped: "success",
+  delivered: "success",
+  cancelled: "danger",
+};
 
 export default function AdminDashboardPage() {
-  const stats = [
-    { label: "Total Revenue", value: formatPrice(adminStats.totalRevenue), change: "+12.5%" },
-    { label: "Total Orders", value: adminStats.totalOrders.toLocaleString(), change: "+8.2%" },
-    { label: "Customers", value: adminStats.totalCustomers.toLocaleString(), change: "+15.1%" },
-    { label: "Products", value: adminStats.totalProducts.toString(), change: "+3" },
-  ];
-
-  const lowStock = sampleProducts.filter((p) => p.stock <= p.low_stock_threshold);
+  const orders = useAdminStore((s) => s.orders);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
-      <aside className="hidden w-64 shrink-0 border-r border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900 lg:block">
-        <Link href="/" className="mb-6 block text-lg font-bold text-blue-600">{siteConfig.name}</Link>
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-400">Admin Panel</p>
-        <nav className="space-y-1">
-          {sidebarLinks.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
-              <Icon className="h-4 w-4" /> {label}
+    <>
+      <DashboardHero />
+
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+        <StatCard label="Total Revenue" value={formatPrice(dashboardKpis.revenue.value)} change={dashboardKpis.revenue.change} icon={DollarSign} iconColor="bg-blue-600 shadow-blue-600/30" trend={dashboardKpis.revenue.trend} index={0} />
+        <StatCard label="Total Orders" value={dashboardKpis.orders.value.toLocaleString()} change={dashboardKpis.orders.change} icon={ShoppingCart} iconColor="bg-emerald-600 shadow-emerald-600/30" trend={dashboardKpis.orders.trend} index={1} />
+        <StatCard label="Customers" value={dashboardKpis.customers.value.toLocaleString()} change={dashboardKpis.customers.change} icon={Users} iconColor="bg-violet-600 shadow-violet-600/30" trend={dashboardKpis.customers.trend} index={2} />
+        <StatCard label="Products" value={dashboardKpis.products.value.toString()} change={dashboardKpis.products.change} icon={Package} iconColor="bg-amber-600 shadow-amber-600/30" trend={dashboardKpis.products.trend} index={3} />
+        <StatCard label="Avg. Order Value" value={formatPrice(dashboardKpis.avgOrder.value)} change={dashboardKpis.avgOrder.change} icon={TrendingUp} iconColor="bg-cyan-600 shadow-cyan-600/30" trend={dashboardKpis.avgOrder.trend} index={4} />
+        <StatCard label="Conversion Rate" value={`${dashboardKpis.conversion.value}%`} change={dashboardKpis.conversion.change} icon={Percent} iconColor="bg-rose-600 shadow-rose-600/30" trend={dashboardKpis.conversion.trend} index={5} />
+      </div>
+
+      <div className="mb-8 grid gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <RevenueOrdersChart />
+        </div>
+        <div className="space-y-6 lg:col-span-5">
+          <PerformanceRings />
+          <HourlyTrafficChart />
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <OrderKanban />
+      </div>
+
+      <div className="mb-8 grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <CategoryPieChart />
+        </div>
+        <LiveActivityFeed />
+      </div>
+
+      <div className="mb-8 grid gap-6 lg:grid-cols-3">
+        <Card className="border-gray-200/80 bg-white/80 backdrop-blur-sm dark:border-gray-800/80 dark:bg-gray-900/80 lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Orders</CardTitle>
+              <p className="text-sm text-gray-500">Latest transactions across the store</p>
+            </div>
+            <Link href="/admin/orders" className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
+              View all <ArrowRight className="h-4 w-4" />
             </Link>
-          ))}
-        </nav>
-      </aside>
+          </CardHeader>
+          <CardContent className="overflow-x-auto p-0 pb-2">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 dark:border-gray-800">
+                  <th className="px-6 py-3 text-left font-medium text-gray-500">Order</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500">Customer</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500">Total</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500">Payment</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.slice(0, 6).map((order) => (
+                  <tr key={order.id} className="border-b border-gray-50 transition-colors hover:bg-gray-50/80 dark:border-gray-800/50 dark:hover:bg-gray-800/30">
+                    <td className="px-6 py-3.5 font-mono text-xs font-semibold text-gray-900 dark:text-white">{order.order_number}</td>
+                    <td className="px-4 py-3.5">
+                      <p className="font-medium text-gray-900 dark:text-white">{order.customer}</p>
+                      <p className="text-xs text-gray-500">{order.items} items</p>
+                    </td>
+                    <td className="px-4 py-3.5 font-semibold">{formatPrice(order.total)}</td>
+                    <td className="px-4 py-3.5">
+                      <Badge variant={statusVariant[order.status] ?? "default"}>{order.status}</Badge>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <Badge variant={order.payment_status === "paid" ? "success" : order.payment_status === "refunded" ? "danger" : "warning"}>
+                        {order.payment_status}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
 
-      <main className="flex-1 p-6 lg:p-8">
-        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h1>
+        <RxQueuePanel />
+      </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => (
-            <Card key={stat.label}>
-              <CardContent className="pt-6">
-                <p className="text-sm text-gray-500">{stat.label}</p>
-                <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                <p className="mt-1 text-xs text-emerald-600">{stat.change} from last month</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><BarChart3 className="h-5 w-5" /> Revenue Chart</CardTitle></CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={adminStats.revenueChart}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip formatter={(value) => formatPrice(Number(value))} />
-                  <Bar dataKey="revenue" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <div className="space-y-6">
-            <Card>
-              <CardHeader><CardTitle>Pending Prescriptions</CardTitle></CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <span className="text-3xl font-bold text-amber-600">{adminStats.pendingPrescriptions}</span>
-                  <Link href="/admin/prescriptions" className="text-sm text-blue-600 hover:underline">Review All →</Link>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="border-gray-200/80 bg-white/80 backdrop-blur-sm dark:border-gray-800/80 dark:bg-gray-900/80">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Top Products</CardTitle>
+            <Link href="/admin/products" className="text-xs text-blue-600 hover:underline">See all</Link>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {topProducts.slice(0, 5).map((p, i) => (
+                <div key={p.id} className="flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 text-xs font-bold text-blue-700 dark:from-blue-900/40 dark:to-blue-950/20 dark:text-blue-400">
+                    {i + 1}
+                  </span>
+                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gray-100 ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+                    <Image src={p.image} alt={p.name} fill className="object-cover" sizes="40px" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{p.name}</p>
+                    <p className="text-xs text-gray-500">{p.sales} sold · {formatPrice(p.revenue)}</p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card>
-              <CardHeader><CardTitle>Low Stock Alerts</CardTitle></CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {lowStock.slice(0, 4).map((p) => (
-                    <div key={p.id} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-700 dark:text-gray-300">{p.name}</span>
-                      <Badge variant="warning">{p.stock} left</Badge>
+        <Card className="border-gray-200/80 bg-white/80 backdrop-blur-sm dark:border-gray-800/80 dark:bg-gray-900/80">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Low Stock Alerts
+            </CardTitle>
+            <Link href="/admin/inventory" className="text-xs text-blue-600 hover:underline">Manage</Link>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {lowStockProducts.slice(0, 6).map((p) => (
+                <div key={p.id} className="flex items-center justify-between gap-2 rounded-xl border border-red-100 bg-red-50/50 p-3 dark:border-red-900/30 dark:bg-red-950/20">
+                  <p className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">{p.name}</p>
+                  <div className="flex items-center gap-2">
+                    <div className="hidden h-1.5 w-16 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 sm:block">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-red-500 to-orange-500"
+                        style={{ width: `${Math.min((p.stock / p.low_stock_threshold) * 100, 100)}%` }}
+                      />
                     </div>
-                  ))}
+                    <Badge variant="warning">{p.stock} left</Badge>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </main>
-    </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
   );
 }

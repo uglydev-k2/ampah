@@ -101,13 +101,6 @@ export const vitaminsProductNames = [
   "Vitamin B6",
 ] as const;
 
-export const vitaminsImages = [
-  "https://images.unsplash.com/photo-1550572017-edd951aa8f71",
-  "https://images.unsplash.com/photo-1526253033463-99c25a0f7d6c",
-  "https://images.unsplash.com/photo-1505751172876-fa1923c5c528",
-  "https://images.unsplash.com/photo-1550572017-edd951aa8f71",
-];
-
 export const vitaminsFeatured = [
   "Centrum",
   "Pregnacare",

@@ -101,13 +101,6 @@ export const painReliefProductNames = [
   "Diclomol",
 ] as const;
 
-export const painReliefImages = [
-  "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae",
-  "https://images.unsplash.com/photo-1471864190281-a93a3070b6de",
-  "https://images.unsplash.com/photo-1587854692152-cad860a0e7a",
-  "https://images.unsplash.com/photo-1603398937418-0a4e1550a67a",
-];
-
 export const painReliefFeatured = [
   "Paracetamol 500mg",
   "Panadol Extra",

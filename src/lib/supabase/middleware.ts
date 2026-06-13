@@ -42,9 +42,26 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (pathname.startsWith("/admin")) {
+    if (pathname === "/admin/login") {
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.role === "admin" || profile?.role === "pharmacist") {
+          const url = request.nextUrl.clone();
+          url.pathname = "/admin";
+          return NextResponse.redirect(url);
+        }
+      }
+      return supabaseResponse;
+    }
+
     if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
+      url.pathname = "/admin/login";
       url.searchParams.set("redirect", pathname);
       return NextResponse.redirect(url);
     }
@@ -57,7 +74,8 @@ export async function updateSession(request: NextRequest) {
 
     if (profile?.role !== "admin" && profile?.role !== "pharmacist") {
       const url = request.nextUrl.clone();
-      url.pathname = "/";
+      url.pathname = "/admin/login";
+      url.searchParams.set("error", "access_denied");
       return NextResponse.redirect(url);
     }
   }

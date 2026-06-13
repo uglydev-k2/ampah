@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,10 @@ import { createClient } from "@/lib/supabase/client";
 import { siteConfig } from "@/config/site";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
@@ -22,25 +25,60 @@ export default function LoginPage() {
   const onLogin = async (data: LoginInput) => {
     setLoading(true);
     setError("");
+    setSuccess("");
     const { error: authError } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
     });
     if (authError) setError(authError.message);
-    else window.location.href = "/dashboard";
+    else router.push("/dashboard");
     setLoading(false);
   };
 
   const onRegister = async (data: RegisterInput) => {
     setLoading(true);
     setError("");
-    const { error: authError } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: { data: { full_name: data.fullName } },
+    setSuccess("");
+
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
-    if (authError) setError(authError.message);
-    else setError("Check your email to confirm your account.");
+
+    const result = (await response.json()) as { error?: string; message?: string; success?: boolean };
+
+    if (response.status === 503) {
+      const { error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: { data: { full_name: data.fullName, phone: data.phone ?? null } },
+      });
+
+      if (authError) {
+        setError(
+          authError.message.includes("Database error")
+            ? "Account setup failed. Run supabase/migrations/002_fix_signup_trigger.sql in your Supabase SQL Editor, then try again."
+            : authError.message
+        );
+      } else {
+        setSuccess("Account created! Check your email to confirm, then sign in.");
+        setIsRegister(false);
+        loginForm.setValue("email", data.email);
+      }
+      setLoading(false);
+      return;
+    }
+
+    if (!response.ok) {
+      setError(result.error ?? "Registration failed. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    setSuccess(result.message ?? "Account created! You can sign in now.");
+    setIsRegister(false);
+    loginForm.setValue("email", data.email);
     setLoading(false);
   };
 
@@ -54,6 +92,9 @@ export default function LoginPage() {
 
         {error && (
           <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950">{error}</div>
+        )}
+        {success && (
+          <div className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700 dark:bg-emerald-950">{success}</div>
         )}
 
         {isRegister ? (
@@ -75,7 +116,15 @@ export default function LoginPage() {
 
         <p className="mt-4 text-center text-sm text-gray-500">
           {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
-          <button onClick={() => { setIsRegister(!isRegister); setError(""); }} className="font-medium text-blue-600 hover:underline">
+          <button
+            type="button"
+            onClick={() => {
+              setIsRegister(!isRegister);
+              setError("");
+              setSuccess("");
+            }}
+            className="font-medium text-blue-600 hover:underline"
+          >
             {isRegister ? "Sign In" : "Create Account"}
           </button>
         </p>

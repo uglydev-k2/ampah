@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/stores/cart-store";
+import { FREE_SHIPPING_THRESHOLD_GHS, SHIPPING_FEE_GHS } from "@/data/ghana-prices";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getSubtotal } = useCartStore();
   const subtotal = getSubtotal();
-  const shipping = subtotal >= 35 ? 0 : 5.99;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD_GHS ? 0 : SHIPPING_FEE_GHS;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
 
@@ -68,7 +69,11 @@ export default function CartPage() {
               </div>
             </div>
           </div>
-          {subtotal < 35 && <p className="mt-2 text-xs text-emerald-600">Add {formatPrice(35 - subtotal)} more for free shipping!</p>}
+          {subtotal < FREE_SHIPPING_THRESHOLD_GHS && (
+            <p className="mt-2 text-xs text-emerald-600">
+              Add {formatPrice(FREE_SHIPPING_THRESHOLD_GHS - subtotal)} more for free shipping!
+            </p>
+          )}
           <div className="mt-6 space-y-3">
             <Link href="/checkout"><Button className="w-full" size="lg">Proceed to Checkout</Button></Link>
             <Link href="/shop"><Button variant="outline" className="w-full">Continue Shopping</Button></Link>

@@ -2,12 +2,14 @@ export const siteConfig = {
   name: "Ampah Pharmacy",
   tagline: "Your Trusted Pharmacy for Quality Healthcare",
   description:
-    "Premium online pharmacy offering prescription services, health products, and expert pharmaceutical care.",
+    "Premium online pharmacy offering prescription services, health products, and expert pharmaceutical care in Ghana.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  currency: "GHS",
+  locale: "en-GH",
   contact: {
-    phone: "+1 (555) 123-4567",
+    phone: "+233 30 123 4567",
     email: "care@ampahpharmacy.com",
-    address: "123 Health Avenue, Medical District, NY 10001",
+    address: "14 Independence Avenue, Accra, Ghana",
   },
   hours: {
     weekdays: "Mon–Fri: 8:00 AM – 9:00 PM",

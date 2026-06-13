@@ -51,7 +51,7 @@ export function Header() {
       <div className="hidden border-b border-blue-50 bg-blue-600 py-1.5 text-center text-sm text-white lg:block dark:border-blue-900">
         <span className="inline-flex items-center gap-2">
           <Phone className="h-3.5 w-3.5" />
-          Free shipping on orders over $35 | Call {siteConfig.contact.phone}
+          Free shipping on orders over GH₵200 | Call {siteConfig.contact.phone}
         </span>
       </div>
 
