@@ -42,7 +42,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (pathname.startsWith("/admin")) {
-    if (pathname === "/admin/login") {
+    if (pathname === "/admin/login" || pathname === "/admin/forgot-password") {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")

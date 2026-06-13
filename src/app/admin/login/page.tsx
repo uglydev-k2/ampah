@@ -17,6 +17,7 @@ function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/admin";
+  const resetSuccess = searchParams.get("reset") === "success";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
@@ -111,6 +112,12 @@ function AdminLoginForm() {
             </div>
           </div>
 
+          {resetSuccess && (
+            <div className="mb-4 rounded-xl border border-emerald-900/50 bg-emerald-950/50 p-3 text-sm text-emerald-300">
+              Password updated. Sign in with your new password.
+            </div>
+          )}
+
           {error && (
             <div className="mb-4 rounded-xl border border-red-900/50 bg-red-950/50 p-3 text-sm text-red-300">
               {error}
@@ -132,6 +139,11 @@ function AdminLoginForm() {
               {...form.register("password")}
               error={form.formState.errors.password?.message}
             />
+            <div className="flex justify-end">
+              <Link href="/admin/forgot-password" className="text-sm text-blue-400 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <Button type="submit" className="w-full shadow-lg shadow-blue-600/30" isLoading={loading}>
               <Lock className="h-4 w-4" />
               Sign In to Dashboard

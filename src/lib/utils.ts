@@ -40,3 +40,16 @@ export function calculateRating(reviews: { rating: number }[]): number {
   const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
   return Math.round((sum / reviews.length) * 10) / 10;
 }
+
+/** Canonical site URL for auth redirects (never localhost on production). */
+export function getSiteUrl(): string {
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
+    return window.location.origin;
+  }
+
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  if (configured && !configured.includes("localhost")) return configured;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  if (configured) return configured;
+  return "http://localhost:3000";
+}
