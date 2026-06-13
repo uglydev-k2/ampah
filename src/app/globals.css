@@ -38,3 +38,40 @@ html {
 ::selection {
   background-color: #2563eb33;
 }
+
+@keyframes mesh-shift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(2%, 1%) scale(1.02); }
+  66% { transform: translate(-1%, 2%) scale(0.98); }
+}
+
+@keyframes grid-drift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(48px, 48px); }
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.3; transform: translateX(-30%); }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; transform: translateX(30%); }
+}
+
+.animate-mesh-shift {
+  animation: mesh-shift 18s ease-in-out infinite;
+}
+
+.animate-grid-drift {
+  animation: grid-drift 40s linear infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-mesh-shift,
+  .animate-grid-drift,
+  .animate-shimmer {
+    animation: none;
+  }
+}

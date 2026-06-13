@@ -45,7 +45,7 @@ export function Header() {
         "sticky top-0 z-50 w-full transition-all duration-300",
         scrolled
           ? "border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/95"
-          : "bg-white dark:bg-gray-950"
+          : "bg-white/70 backdrop-blur-sm dark:bg-gray-950/70"
       )}
     >
       <div className="hidden border-b border-blue-50 bg-blue-600 py-1.5 text-center text-sm text-white lg:block dark:border-blue-900">

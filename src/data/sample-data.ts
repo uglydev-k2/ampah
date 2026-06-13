@@ -1,4 +1,15 @@
 import type { Product, Category, Review } from "@/types/database";
+import { buildCatalogProducts } from "@/data/product-factory";
+import {
+  painReliefFeatured,
+  painReliefImages,
+  painReliefProductNames,
+} from "@/data/catalog/pain-relief";
+import {
+  vitaminsFeatured,
+  vitaminsImages,
+  vitaminsProductNames,
+} from "@/data/catalog/vitamins-supplements";
 
 export const sampleCategories: Category[] = [
   { id: "cat-1", name: "Pain Relief", slug: "pain-relief", description: "Effective pain management solutions", image_url: null, created_at: "2024-01-01" },
@@ -13,31 +24,33 @@ export const sampleCategories: Category[] = [
   { id: "cat-10", name: "First Aid", slug: "first-aid", description: "Emergency care essentials", image_url: null, created_at: "2024-01-01" },
 ];
 
-export const sampleProducts: Product[] = [
-  {
-    id: "prod-1", name: "Ibuprofen 200mg", slug: "ibuprofen-200mg",
-    description: "Fast-acting pain relief for headaches, muscle aches, and fever. Each tablet contains 200mg of ibuprofen for effective relief.",
-    short_description: "Fast-acting pain relief tablets",
-    price: 8.99, compare_at_price: 12.99, category_id: "cat-1",
-    image_url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop",
-    images: ["https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=800&fit=crop"],
-    ingredients: "Ibuprofen 200mg, Microcrystalline Cellulose, Starch",
-    usage_instructions: "Take 1-2 tablets every 4-6 hours. Do not exceed 6 tablets in 24 hours.",
-    stock: 150, low_stock_threshold: 20, rating: 4.8, review_count: 234,
-    is_featured: true, is_active: true, created_at: "2024-01-01", updated_at: "2024-01-01",
+const painReliefProducts = buildCatalogProducts({
+  names: [...painReliefProductNames],
+  categoryId: "cat-1",
+  idPrefix: "pain",
+  images: painReliefImages,
+  featuredNames: [...painReliefFeatured],
+  descriptions: {
+    short: "Trusted pain relief product",
+    long: "Pharmacy-grade analgesic for effective relief of pain, inflammation, and discomfort.",
+    usage: "Use as directed on the package or consult your pharmacist before use.",
   },
-  {
-    id: "prod-2", name: "Vitamin D3 5000 IU", slug: "vitamin-d3-5000",
-    description: "High-potency Vitamin D3 supplement to support bone health, immune function, and overall wellness.",
-    short_description: "High-potency bone health supplement",
-    price: 14.99, compare_at_price: null, category_id: "cat-2",
-    image_url: "https://images.unsplash.com/photo-1550572017-edd951aa8f71?w=400&h=400&fit=crop",
-    images: ["https://images.unsplash.com/photo-1550572017-edd951aa8f71?w=800&h=800&fit=crop"],
-    ingredients: "Vitamin D3 (Cholecalciferol) 5000 IU, Olive Oil, Gelatin",
-    usage_instructions: "Take 1 softgel daily with a meal.",
-    stock: 200, low_stock_threshold: 25, rating: 4.9, review_count: 412,
-    is_featured: true, is_active: true, created_at: "2024-01-01", updated_at: "2024-01-01",
+});
+
+const vitaminProducts = buildCatalogProducts({
+  names: [...vitaminsProductNames],
+  categoryId: "cat-2",
+  idPrefix: "vitamin",
+  images: vitaminsImages,
+  featuredNames: [...vitaminsFeatured],
+  descriptions: {
+    short: "Daily wellness supplement",
+    long: "Quality vitamin and supplement formulated to support health and daily nutrition.",
+    usage: "Take as directed with food unless otherwise advised by your healthcare provider.",
   },
+});
+
+const otherCategoryProducts: Product[] = [
   {
     id: "prod-3", name: "Cold & Flu Relief", slug: "cold-flu-relief",
     description: "Multi-symptom relief for cold and flu including congestion, cough, and body aches.",
@@ -87,7 +100,7 @@ export const sampleProducts: Product[] = [
     is_featured: false, is_active: true, created_at: "2024-01-01", updated_at: "2024-01-01",
   },
   {
-    id: "prod-7", name: "Omega-3 Fish Oil", slug: "omega-3-fish-oil",
+    id: "prod-7", name: "Omega-3 Heart Support", slug: "omega-3-heart-support",
     description: "Premium fish oil supplement supporting heart, brain, and joint health.",
     short_description: "Heart & brain health supplement",
     price: 19.99, compare_at_price: 24.99, category_id: "cat-7",
@@ -134,36 +147,18 @@ export const sampleProducts: Product[] = [
     stock: 55, low_stock_threshold: 10, rating: 4.7, review_count: 87,
     is_featured: true, is_active: true, created_at: "2024-01-01", updated_at: "2024-01-01",
   },
-  {
-    id: "prod-11", name: "Acetaminophen 500mg", slug: "acetaminophen-500mg",
-    description: "Extra strength pain reliever and fever reducer.",
-    short_description: "Extra strength pain reliever",
-    price: 7.49, compare_at_price: null, category_id: "cat-1",
-    image_url: "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&h=400&fit=crop",
-    images: ["https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&h=800&fit=crop"],
-    ingredients: "Acetaminophen 500mg",
-    usage_instructions: "Take 1-2 caplets every 6 hours. Max 8 caplets per day.",
-    stock: 200, low_stock_threshold: 30, rating: 4.6, review_count: 189,
-    is_featured: false, is_active: true, created_at: "2024-01-01", updated_at: "2024-01-01",
-  },
-  {
-    id: "prod-12", name: "Multivitamin Daily", slug: "multivitamin-daily",
-    description: "Complete daily multivitamin with 23 essential vitamins and minerals.",
-    short_description: "23 essential vitamins & minerals",
-    price: 16.99, compare_at_price: 21.99, category_id: "cat-2",
-    image_url: "https://images.unsplash.com/photo-1526253033463-99c25a0f7d6c?w=400&h=400&fit=crop",
-    images: ["https://images.unsplash.com/photo-1526253033463-99c25a0f7d6c?w=800&h=800&fit=crop"],
-    ingredients: "Vitamin A, C, D, E, B-Complex, Zinc, Iron, Calcium",
-    usage_instructions: "Take 1 tablet daily with food.",
-    stock: 180, low_stock_threshold: 25, rating: 4.7, review_count: 345,
-    is_featured: false, is_active: true, created_at: "2024-01-01", updated_at: "2024-01-01",
-  },
+];
+
+export const sampleProducts: Product[] = [
+  ...painReliefProducts,
+  ...vitaminProducts,
+  ...otherCategoryProducts,
 ];
 
 export const sampleReviews: Review[] = [
-  { id: "rev-1", product_id: "prod-1", user_id: "user-1", rating: 5, title: "Works great!", comment: "Fast relief for my headaches. Highly recommend.", created_at: "2024-02-15" },
-  { id: "rev-2", product_id: "prod-1", user_id: "user-2", rating: 4, title: "Good product", comment: "Effective but takes about 30 minutes to kick in.", created_at: "2024-02-20" },
-  { id: "rev-3", product_id: "prod-2", user_id: "user-3", rating: 5, title: "Essential supplement", comment: "My doctor recommended this and I feel much better.", created_at: "2024-03-01" },
+  { id: "rev-1", product_id: "pain-1", user_id: "user-1", rating: 5, title: "Works great!", comment: "Fast relief for my headaches. Highly recommend.", created_at: "2024-02-15" },
+  { id: "rev-2", product_id: "pain-1", user_id: "user-2", rating: 4, title: "Good product", comment: "Effective but takes about 30 minutes to kick in.", created_at: "2024-02-20" },
+  { id: "rev-3", product_id: "vitamin-12", user_id: "user-3", rating: 5, title: "Essential supplement", comment: "My doctor recommended this and I feel much better.", created_at: "2024-03-01" },
 ];
 
 export const testimonials = [
@@ -187,7 +182,7 @@ export const adminStats = {
   totalRevenue: 128450,
   totalOrders: 1847,
   totalCustomers: 3421,
-  totalProducts: 156,
+  totalProducts: sampleProducts.length,
   pendingPrescriptions: 12,
   lowStockItems: 8,
   revenueChart: [
@@ -231,3 +226,9 @@ export function getCategoryBySlug(slug: string): Category | undefined {
 export function getReviewsByProduct(productId: string): Review[] {
   return sampleReviews.filter((r) => r.product_id === productId);
 }
+
+export const catalogCounts = {
+  painRelief: painReliefProductNames.length,
+  vitamins: vitaminsProductNames.length,
+  total: sampleProducts.length,
+};
