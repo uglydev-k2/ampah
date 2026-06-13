@@ -11,7 +11,7 @@ export const siteConfig = {
   currency: "GHS",
   locale: "en-GH",
   contact: {
-    phone: "+233 30 123 4567",
+    phone: "0554873890",
     email: "care@ampahpharmacy.com",
     address: "14 Independence Avenue, Accra, Ghana",
   },

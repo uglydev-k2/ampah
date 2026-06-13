@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Header } from "./header";
 import { Footer } from "./footer";
 import { AnimatedBackground } from "@/components/ui/animated-background";
+import { PharmacyAiChat } from "@/components/chat/pharmacy-ai-chat";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <Header />
       <main className="relative flex-1">{children}</main>
       <Footer />
+      <PharmacyAiChat />
     </div>
   );
 }
