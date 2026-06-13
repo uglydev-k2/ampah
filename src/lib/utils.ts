@@ -41,6 +41,8 @@ export function calculateRating(reviews: { rating: number }[]): number {
   return Math.round((sum / reviews.length) * 10) / 10;
 }
 
+import { PRODUCTION_SITE_URL } from "@/config/site";
+
 /** Canonical site URL for auth redirects (never localhost on production). */
 export function getSiteUrl(): string {
   if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
@@ -49,7 +51,19 @@ export function getSiteUrl(): string {
 
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
   if (configured && !configured.includes("localhost")) return configured;
+  if (process.env.VERCEL) return PRODUCTION_SITE_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   if (configured) return configured;
   return "http://localhost:3000";
+}
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  otp_expired: "This reset link has expired. Please request a new one below.",
+  access_denied: "This reset link is invalid or has already been used. Request a new one below.",
+  invalid_link: "This reset link is invalid. Please request a new one below.",
+};
+
+export function getAuthErrorMessage(code: string | null): string | null {
+  if (!code) return null;
+  return AUTH_ERROR_MESSAGES[code] ?? "Authentication failed. Please try again.";
 }

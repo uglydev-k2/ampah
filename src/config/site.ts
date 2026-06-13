@@ -1,9 +1,13 @@
+export const PRODUCTION_SITE_URL = "https://ampah-7g16.vercel.app";
+
 export const siteConfig = {
   name: "Ampah Pharmacy",
   tagline: "Your Trusted Pharmacy for Quality Healthcare",
   description:
     "Premium online pharmacy offering prescription services, health products, and expert pharmaceutical care in Ghana.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    (process.env.VERCEL ? PRODUCTION_SITE_URL : "http://localhost:3000"),
   currency: "GHS",
   locale: "en-GH",
   contact: {

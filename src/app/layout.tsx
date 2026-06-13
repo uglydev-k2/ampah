@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { MainLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { AuthHashErrorHandler } from "@/components/auth/auth-hash-error-handler";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`}>
         <ThemeProvider>
+          <AuthHashErrorHandler />
           <MainLayout>{children}</MainLayout>
         </ThemeProvider>
       </body>

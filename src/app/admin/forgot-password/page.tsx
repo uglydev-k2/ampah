@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { siteConfig } from "@/config/site";
-import { getSiteUrl } from "@/lib/utils";
+import { getAuthErrorMessage, getSiteUrl } from "@/lib/utils";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -20,6 +21,8 @@ const schema = z.object({
 type ForgotInput = z.infer<typeof schema>;
 
 function AdminForgotPasswordForm() {
+  const searchParams = useSearchParams();
+  const linkError = getAuthErrorMessage(searchParams.get("error"));
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,7 +35,7 @@ function AdminForgotPasswordForm() {
     setSuccess(false);
 
     const siteUrl = getSiteUrl();
-    const redirectTo = `${siteUrl}/auth/confirm?next=/auth/reset-password&redirect=${encodeURIComponent("/admin/login")}`;
+    const redirectTo = `${siteUrl}/auth/verify?next=/auth/reset-password&redirect=${encodeURIComponent("/admin/login")}`;
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(data.email, {
       redirectTo,
@@ -77,13 +80,19 @@ function AdminForgotPasswordForm() {
               </div>
             </div>
 
+            {linkError && (
+              <div className="mb-4 rounded-xl border border-amber-900/50 bg-amber-950/50 p-3 text-sm text-amber-200">
+                {linkError}
+              </div>
+            )}
+
             {error && (
               <div className="mb-4 rounded-xl border border-red-900/50 bg-red-950/50 p-3 text-sm text-red-300">{error}</div>
             )}
             {success && (
               <div className="mb-4 rounded-xl border border-emerald-900/50 bg-emerald-950/50 p-3 text-sm text-emerald-300">
-                Reset link sent! Check your email and open the link on this device. It will go to{" "}
-                <strong>{getSiteUrl()}</strong>, not localhost.
+                Reset link sent! Open the email on your phone and tap the link within 1 hour. It will go to{" "}
+                <strong>{getSiteUrl()}</strong>.
               </div>
             )}
 
